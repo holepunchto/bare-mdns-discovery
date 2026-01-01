@@ -3,6 +3,7 @@
 Minimal mDNS/DNS-SD service discovery.
 
 ## Installation
+
 ```
 npm install @holepunchto/bare-mdns-discovery
 ```
@@ -10,6 +11,7 @@ npm install @holepunchto/bare-mdns-discovery
 ## Usage
 
 ### Low-level mDNS queries
+
 ```javascript
 const { MDNS } = require('@holepunchto/bare-mdns-discovery')
 
@@ -31,6 +33,7 @@ setTimeout(() => mdns.close(), 10000)
 ```
 
 ### Service discovery
+
 ```javascript
 const { Discovery } = require('bare-mdns-discovery')
 
@@ -48,6 +51,7 @@ await discovery.close()
 ```
 
 ### Extending for specific services
+
 ```javascript
 const { Discovery } = require('bare-mdns-discovery')
 
@@ -76,6 +80,7 @@ class MyServiceDiscovery extends Discovery {
 Create a low-level mDNS instance.
 
 Options:
+
 - `debug` (boolean): Enable debug logging. Default: `false`
 
 #### `mdns.ready()`
@@ -96,6 +101,7 @@ Close the socket. Returns a Promise.
 #### Event: `'records'`
 
 Emitted when records are received.
+
 ```javascript
 mdns.on('records', (records, rinfo) => {
   // records: Array of parsed DNS records
@@ -108,6 +114,7 @@ mdns.on('records', (records, rinfo) => {
 High-level service discovery. Extends `MDNS`.
 
 Options:
+
 - `service` (string): Service type without prefix/suffix, e.g. `'http'`, `'googlecast'`
 - `debug` (boolean): Enable debug logging. Default: `false`
 
@@ -124,6 +131,7 @@ Map of discovered services keyed by uid.
 #### Event: `'service'`
 
 Emitted when a service is discovered.
+
 ```javascript
 discovery.on('service', (service) => {
   // service: { uid, name, address, addresses, port, target, txt }
@@ -131,17 +139,19 @@ discovery.on('service', (service) => {
 ```
 
 ### Record Types
+
 ```javascript
 const { TYPE } = require('bare-mdns-discovery')
 
-TYPE.A     // 1 - IPv4 address
-TYPE.PTR   // 12 - Pointer
-TYPE.TXT   // 16 - Text
-TYPE.AAAA  // 28 - IPv6 address
-TYPE.SRV   // 33 - Service
+TYPE.A // 1 - IPv4 address
+TYPE.PTR // 12 - Pointer
+TYPE.TXT // 16 - Text
+TYPE.AAAA // 28 - IPv6 address
+TYPE.SRV // 33 - Service
 ```
 
 ### Constants
+
 ```javascript
 const { MDNS_ADDR, MDNS_PORT } = require('bare-mdns-discovery')
 
