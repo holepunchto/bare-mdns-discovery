@@ -1,8 +1,14 @@
 {
   "name": "@holepunchto/bare-mdns-discovery",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "bare-mdns-discovery",
   "main": "index.js",
+  "imports": {
+    "dgram": {
+      "bare": "bare-dgram",
+      "default": "dgram"
+    }
+  },
   "exports": {
     "./package": "./package.json",
     ".": {
