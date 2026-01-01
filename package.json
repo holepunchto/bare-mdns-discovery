@@ -1,7 +1,7 @@
 {
-  "name": "@holepunchto/repo-template",
+  "name": "@holepunchto/bare-mdns-discovery",
   "version": "0.0.1",
-  "description": "repo-template",
+  "description": "bare-mdns-discovery",
   "main": "index.js",
   "exports": {
     "./package": "./package.json",
@@ -28,12 +28,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/holepunchto/repo-template.git"
+    "url": "https://github.com/holepunchto/bare-mdns-discovery.git"
   },
   "author": "Holepunch Inc",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/holepunchto/repo-template/issues"
+    "url": "https://github.com/holepunchto/bare-mdns-discovery/issues"
   },
-  "homepage": "https://github.com/holepunchto/repo-template"
+  "homepage": "https://github.com/holepunchto/bare-mdns-discovery",
+  "dependencies": {
+    "bare-dgram": "^1.0.1",
+    "ready-resource": "^1.2.0"
+  }
 }
