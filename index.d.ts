@@ -60,7 +60,7 @@ declare module '@holepunchto/bare-mdns-discovery' {
   export const MDNS_ADDR: '224.0.0.251'
   export const MDNS_PORT: 5353
 
-  class MDNS extends ReadyResource {
+  export class MDNS extends ReadyResource {
     constructor(opts?: MDNSOptions)
 
     debug: boolean
@@ -89,7 +89,7 @@ declare module '@holepunchto/bare-mdns-discovery' {
     emit(event: 'close'): boolean
   }
 
-  class Discovery extends MDNS {
+  export class Discovery extends MDNS {
     constructor(opts?: DiscoveryOptions)
 
     service: string
@@ -124,6 +124,5 @@ declare module '@holepunchto/bare-mdns-discovery' {
     protected _parseService(records: Record[], rinfo: RecordInfo): Service | null
   }
 
-  export { MDNS, Discovery }
   export default MDNS
 }

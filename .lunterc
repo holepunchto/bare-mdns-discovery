@@ -1,0 +1,5 @@
+{
+  "rules": {
+    "constructor-super": "off"
+  }
+}

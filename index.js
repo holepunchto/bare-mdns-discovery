@@ -252,7 +252,7 @@ class Discovery extends MDNS {
     let txt = null
     let srv = null
     let ipv4 = null
-    let ipv6 = []
+    const ipv6 = []
 
     for (const r of records) {
       if (r.type === TYPE.PTR && r.name === `_${this.service}._tcp.local`) {
