@@ -285,7 +285,10 @@ class Discovery extends MDNS {
     }
   }
 
-  discover(timeout = 10) {
+  discover(opts = {}) {
+    const first = !!opts.first
+    const timeout = opts.timeout || 10_000
+
     return new Promise((resolve) => {
       this.services.clear()
 
@@ -293,13 +296,21 @@ class Discovery extends MDNS {
       query()
       this._interval = setInterval(query, 2000)
 
-      setTimeout(() => {
+      if (first) {
+        this.once('service', (s) => {
+          clearInterval(this._interval)
+          clearTimeout(timeoutId)
+          resolve([s])
+        })
+      }
+
+      const timeoutId = setTimeout(() => {
         if (this._interval) {
           clearInterval(this._interval)
           this._interval = null
         }
         resolve([...this.services.values()])
-      }, timeout * 1000)
+      }, timeout)
     })
   }
 
