@@ -99,7 +99,7 @@ declare module 'bare-mdns-discovery' {
     service: string
     services: Map<string, Service>
 
-    discover(timeout?: number): Promise<Service[]>
+    discover(opts?: { first?: boolean; timeout?: number }): Promise<Service[]>
 
     on(event: 'service', listener: (service: Service) => void): this
     on(event: 'records', listener: (records: Record[], rinfo: RecordInfo) => void): this
