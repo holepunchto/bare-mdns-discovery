@@ -43,6 +43,10 @@ declare module '@holepunchto/bare-mdns-discovery' {
 
   export interface MDNSOptions {
     debug?: boolean
+    /** IPv4 address of the network interface to bind multicast membership on.
+     *  Required on Android: pass the WiFi interface IP so the kernel delivers
+     *  mDNS responses on the correct interface. */
+    iface?: string
   }
 
   export interface DiscoveryOptions extends MDNSOptions {

@@ -82,6 +82,7 @@ Create a low-level mDNS instance.
 Options:
 
 - `debug` (boolean): Enable debug logging. Default: `false`
+- `iface` (string): IPv4 address of the network interface to join the multicast group on. Required on Android — without this, `addMembership` falls back to the OS default interface which may not be the WiFi interface, causing responses to be silently dropped. Pass the WiFi IP (e.g. from `bare-wifi-android`'s `getWifiIP()`).
 
 #### `mdns.ready()`
 

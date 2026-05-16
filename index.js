@@ -179,6 +179,7 @@ class MDNS extends ReadyResource {
     super()
     this.socket = null
     this.debug = opts.debug || false
+    this.iface = opts.iface || null
   }
 
   _log(...args) {
@@ -204,6 +205,16 @@ class MDNS extends ReadyResource {
     await new Promise((resolve) => {
       this.socket.bind(MDNS_PORT, () => {
         this._log('bound to port', MDNS_PORT)
+        // bare-dgram doesn't expose addMembership; reach through to the underlying
+        // udx-native socket which does. On Android the iface must be specified
+        // explicitly or the kernel won't deliver multicast even with MulticastLock held.
+        const udxSocket = this.socket._socket || this.socket
+        try {
+          udxSocket.addMembership(MDNS_ADDR, this.iface || '')
+          this._log('joined multicast group on', this.iface || 'default iface')
+        } catch (e) {
+          this._log('addMembership failed:', e.message)
+        }
         resolve()
       })
     })
