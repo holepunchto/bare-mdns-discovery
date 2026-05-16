@@ -1,4 +1,4 @@
-declare module '@holepunchto/bare-mdns-discovery' {
+declare module 'bare-mdns-discovery' {
   import ReadyResource from 'ready-resource'
 
   export interface RecordInfo {
