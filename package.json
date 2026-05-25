@@ -1,6 +1,6 @@
 {
   "name": "bare-mdns-discovery",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "bare-mdns-discovery",
   "main": "index.js",
   "imports": {
