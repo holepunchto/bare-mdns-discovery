@@ -1,11 +1,13 @@
 # bare-mdns-discovery
 
+> ⚠️ **Experimental** Claude generated prototype
+
 Minimal mDNS/DNS-SD service discovery.
 
 ## Installation
 
 ```
-npm install @holepunchto/bare-mdns-discovery
+npm install bare-mdns-discovery
 ```
 
 ## Usage
@@ -13,7 +15,7 @@ npm install @holepunchto/bare-mdns-discovery
 ### Low-level mDNS queries
 
 ```javascript
-const { MDNS } = require('@holepunchto/bare-mdns-discovery')
+const { MDNS } = require('bare-mdns-discovery')
 
 const mdns = new MDNS({ debug: true })
 await mdns.ready()
