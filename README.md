@@ -75,92 +75,339 @@ class MyServiceDiscovery extends Discovery {
 }
 ```
 
+<!-- bare-refgen:api start -->
+
 ## API
 
-### `new MDNS(opts?)`
+### MDNS
 
-Create a low-level mDNS instance.
+#### `new MDNS(opts?: MDNSOptions)`
 
-Options:
+Send and receive raw mDNS queries and records over UDP multicast. Extends `ReadyResource`; open it with `ready()` and release its socket with `close()`.
 
-- `debug` (boolean): Enable debug logging. Default: `false`
-- `iface` (string): IPv4 address of the network interface to join the multicast group on. Required on Android — without this, `addMembership` falls back to the OS default interface which may not be the WiFi interface, causing responses to be silently dropped. Pass the WiFi IP (e.g. from `bare-wifi-android`'s `getWifiIP()`).
+**Parameters**
 
-#### `mdns.ready()`
+| Parameter | Type          | Default | Description                                 |
+| --------- | ------------- | ------- | ------------------------------------------- |
+| `opts?`   | `MDNSOptions` | —       | Options; see [`MDNSOptions`](#mdnsoptions). |
 
-Wait for the socket to be bound. Returns a Promise.
+#### `debug: boolean`
 
-#### `mdns.query(name, type?)`
+Whether internal activity is logged to the console.
 
-Send an mDNS query.
+#### `emit(event: 'records', records: Record[], rinfo: RecordInfo): boolean`
 
-- `name` (string): Service name, e.g. `'_http._tcp.local'`
-- `type` (number): Record type. Default: `TYPE.PTR` (12)
+Overloads:
 
-#### `mdns.close()`
-
-Close the socket. Returns a Promise.
-
-#### Event: `'records'`
-
-Emitted when records are received.
-
-```javascript
-mdns.on('records', (records, rinfo) => {
-  // records: Array of parsed DNS records
-  // rinfo: { address, port, family, size }
-})
+```ts
+emit(event: 'records', records: Record[], rinfo: RecordInfo): boolean
+emit(event: 'error', err: Error): boolean
+emit(event: 'ready'): boolean
+emit(event: 'close'): boolean
 ```
 
-### `new Discovery(opts?)`
+**Parameters**
 
-High-level service discovery. Extends `MDNS`.
+| Parameter | Type         | Default | Description |
+| --------- | ------------ | ------- | ----------- |
+| `event`   | `'records'`  | —       | —           |
+| `records` | `Record[]`   | —       | —           |
+| `rinfo`   | `RecordInfo` | —       | —           |
 
-Options:
+#### `off(event: 'records', listener: (records: Record[], rinfo: RecordInfo) => void): this`
 
-- `service` (string): Service type without prefix/suffix, e.g. `'http'`, `'googlecast'`
-- `debug` (boolean): Enable debug logging. Default: `false`
+Overloads:
 
-#### `discovery.discover(timeout?)`
-
-Discover services on the network. Returns a Promise resolving to an array of services.
-
-- `timeout` (number): Discovery timeout in seconds. Default: `10`
-
-#### `discovery.services`
-
-Map of discovered services keyed by uid.
-
-#### Event: `'service'`
-
-Emitted when a service is discovered.
-
-```javascript
-discovery.on('service', (service) => {
-  // service: { uid, name, address, addresses, port, target, txt }
-})
+```ts
+off(event: 'records', listener: (records: Record[], rinfo: RecordInfo) => void): this
+off(event: 'error', listener: (err: Error) => void): this
+off(event: 'ready', listener: () => void): this
+off(event: 'close', listener: () => void): this
 ```
 
-### Record Types
+**Parameters**
 
-```javascript
-const { TYPE } = require('bare-mdns-discovery')
+| Parameter  | Type                                             | Default | Description |
+| ---------- | ------------------------------------------------ | ------- | ----------- |
+| `event`    | `'records'`                                      | —       | —           |
+| `listener` | `(records: Record[], rinfo: RecordInfo) => void` | —       | —           |
 
-TYPE.A // 1 - IPv4 address
-TYPE.PTR // 12 - Pointer
-TYPE.TXT // 16 - Text
-TYPE.AAAA // 28 - IPv6 address
-TYPE.SRV // 33 - Service
+#### `on(event: 'records', listener: (records: Record[], rinfo: RecordInfo) => void): this`
+
+Overloads:
+
+```ts
+on(event: 'records', listener: (records: Record[], rinfo: RecordInfo) => void): this
+on(event: 'error', listener: (err: Error) => void): this
+on(event: 'ready', listener: () => void): this
+on(event: 'close', listener: () => void): this
 ```
 
-### Constants
+**Parameters**
 
-```javascript
-const { MDNS_ADDR, MDNS_PORT } = require('bare-mdns-discovery')
+| Parameter  | Type                                             | Default | Description |
+| ---------- | ------------------------------------------------ | ------- | ----------- |
+| `event`    | `'records'`                                      | —       | —           |
+| `listener` | `(records: Record[], rinfo: RecordInfo) => void` | —       | —           |
 
-MDNS_ADDR // '224.0.0.251'
-MDNS_PORT // 5353
+#### `once(event: 'records', listener: (records: Record[], rinfo: RecordInfo) => void): this`
+
+Overloads:
+
+```ts
+once(event: 'records', listener: (records: Record[], rinfo: RecordInfo) => void): this
+once(event: 'error', listener: (err: Error) => void): this
+once(event: 'ready', listener: () => void): this
+once(event: 'close', listener: () => void): this
 ```
+
+**Parameters**
+
+| Parameter  | Type                                             | Default | Description |
+| ---------- | ------------------------------------------------ | ------- | ----------- |
+| `event`    | `'records'`                                      | —       | —           |
+| `listener` | `(records: Record[], rinfo: RecordInfo) => void` | —       | —           |
+
+#### `query(name: string, type?: number): void`
+
+Sends an mDNS query for `name`.
+
+**Parameters**
+
+| Parameter | Type     | Default | Description                                                  |
+| --------- | -------- | ------- | ------------------------------------------------------------ |
+| `name`    | `string` | —       | The DNS name to query for, for example `'_http._tcp.local'`. |
+| `type?`   | `number` | —       | The DNS record type to request (default `TYPE.PTR`).         |
+
+#### `socket: object | null`
+
+The underlying UDP socket, or `null` before the resource has opened.
+
+### Discovery
+
+#### `new Discovery(opts?: DiscoveryOptions)`
+
+Discovers instances of a specific mDNS `service` (such as `'googlecast'` or `'http'`) by periodically querying for it and parsing SRV, TXT, and address records into `Service` objects. Extends `MDNS`; subclass and override `_parseService` to customize how records are turned into a `Service` for a given service type.
+
+**Parameters**
+
+| Parameter | Type               | Default | Description                                           |
+| --------- | ------------------ | ------- | ----------------------------------------------------- |
+| `opts?`   | `DiscoveryOptions` | —       | Options; see [`DiscoveryOptions`](#discoveryoptions). |
+
+#### `discover(opts?: { first?: boolean; timeout?: number }): Promise<Service[]>`
+
+Queries for the configured service every 2 seconds until `timeout` milliseconds elapse (default `10000`), or resolves early when `opts.first` is set and a service has been found.
+
+**Parameters**
+
+| Parameter | Type                                    | Default | Description                                                                                                                                                                                            |
+| --------- | --------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `opts?`   | `{ first?: boolean; timeout?: number }` | —       | Options: `timeout` is how long, in milliseconds, to keep querying before resolving (default `10000`); set `first` to resolve as soon as the first service is found instead of waiting out the timeout. |
+
+**Returns** `Promise<Service[]>` — The discovered `Service` objects — a single-element array when `opts.first` resolved early.
+
+#### `emit(event: 'service', service: Service): boolean`
+
+Overloads:
+
+```ts
+emit(event: 'service', service: Service): boolean
+emit(event: 'records', records: Record[], rinfo: RecordInfo): boolean
+emit(event: 'error', err: Error): boolean
+emit(event: 'ready'): boolean
+emit(event: 'close'): boolean
+```
+
+**Parameters**
+
+| Parameter | Type        | Default | Description |
+| --------- | ----------- | ------- | ----------- |
+| `event`   | `'service'` | —       | —           |
+| `service` | `Service`   | —       | —           |
+
+#### `off(event: 'service', listener: (service: Service) => void): this`
+
+Overloads:
+
+```ts
+off(event: 'service', listener: (service: Service) => void): this
+off(event: 'records', listener: (records: Record[], rinfo: RecordInfo) => void): this
+off(event: 'error', listener: (err: Error) => void): this
+off(event: 'ready', listener: () => void): this
+off(event: 'close', listener: () => void): this
+```
+
+**Parameters**
+
+| Parameter  | Type                         | Default | Description |
+| ---------- | ---------------------------- | ------- | ----------- |
+| `event`    | `'service'`                  | —       | —           |
+| `listener` | `(service: Service) => void` | —       | —           |
+
+#### `on(event: 'service', listener: (service: Service) => void): this`
+
+Overloads:
+
+```ts
+on(event: 'service', listener: (service: Service) => void): this
+on(event: 'records', listener: (records: Record[], rinfo: RecordInfo) => void): this
+on(event: 'error', listener: (err: Error) => void): this
+on(event: 'ready', listener: () => void): this
+on(event: 'close', listener: () => void): this
+```
+
+**Parameters**
+
+| Parameter  | Type                         | Default | Description |
+| ---------- | ---------------------------- | ------- | ----------- |
+| `event`    | `'service'`                  | —       | —           |
+| `listener` | `(service: Service) => void` | —       | —           |
+
+#### `once(event: 'service', listener: (service: Service) => void): this`
+
+Overloads:
+
+```ts
+once(event: 'service', listener: (service: Service) => void): this
+once(event: 'records', listener: (records: Record[], rinfo: RecordInfo) => void): this
+once(event: 'error', listener: (err: Error) => void): this
+once(event: 'ready', listener: () => void): this
+once(event: 'close', listener: () => void): this
+```
+
+**Parameters**
+
+| Parameter  | Type                         | Default | Description |
+| ---------- | ---------------------------- | ------- | ----------- |
+| `event`    | `'service'`                  | —       | —           |
+| `listener` | `(service: Service) => void` | —       | —           |
+
+#### `service: string`
+
+The mDNS service name being discovered.
+
+#### `services: Map<string, Service>`
+
+A map of discovered services, keyed by service `uid`, accumulated since the last `discover()` call.
+
+### Constants and variables
+
+#### `TYPE`
+
+```ts
+TYPE: {
+    readonly A: 1
+    readonly PTR: 12
+    readonly TXT: 16
+    readonly AAAA: 28
+    readonly SRV: 33
+  }
+```
+
+DNS record type numbers used in mDNS queries and records, per RFC 6762: `A`, `PTR`, `TXT`, `AAAA`, and `SRV`.
+
+#### `MDNS_ADDR: '224.0.0.251'`
+
+The IPv4 multicast address used for mDNS, `224.0.0.251`, per RFC 6762.
+
+#### `MDNS_PORT: 5353`
+
+The UDP port used for mDNS, `5353`, per RFC 6762.
+
+### Types
+
+#### `RecordInfo`
+
+```ts
+interface RecordInfo {
+  address: string
+  port: number
+  family: 'IPv4' | 'IPv6'
+  size: number
+}
+```
+
+The remote address information for a received mDNS packet: `address`, `port`, `family`, and the packet `size` in bytes.
+
+#### `SRVData`
+
+```ts
+interface SRVData {
+  priority: number
+  weight: number
+  port: number
+  target: string
+}
+```
+
+The parsed data of an SRV record: `priority`, `weight`, `port`, and `target` hostname.
+
+#### `TXTData`
+
+```ts
+interface TXTData {}
+```
+
+The parsed key/value pairs of a TXT record. A key with no `=` in its entry is stored with the value `true`.
+
+#### `Record`
+
+```ts
+interface Record {
+  name: string
+  type: number
+  class: number
+  flush: boolean
+  ttl: number
+  data: string | TXTData | SRVData | Buffer
+}
+```
+
+A single parsed DNS resource record from an mDNS response: `name`, `type`, `class`, the `flush` cache-flush bit, `ttl`, and the type-specific `data`.
+
+#### `Service`
+
+```ts
+interface Service {
+  uid: string
+  name: string
+  address: string
+  addresses: {
+    ipv4: string | null
+    ipv6: string[]
+  }
+  port: number
+  target: string
+  txt: TXTData
+}
+```
+
+A discovered service: its unique id, `name`, resolved `address`, all known `addresses` (IPv4 and IPv6), `port`, SRV `target` hostname, and `txt` record data.
+
+#### `MDNSOptions`
+
+```ts
+interface MDNSOptions {
+  debug?: boolean
+  iface?: string
+}
+```
+
+Options for `MDNS`. `debug` logs internal activity to the console. `iface` is the IPv4 address of the network interface to bind multicast membership on; required on Android, where it must be the WiFi interface IP so the kernel delivers mDNS responses on the correct interface.
+
+#### `DiscoveryOptions`
+
+```ts
+interface DiscoveryOptions {
+  service?: string
+  debug?: boolean
+  iface?: string
+}
+```
+
+Options for `Discovery`, extending `MDNSOptions` with `service`, the mDNS service name to query for (e.g. `'googlecast'`).
+<!-- bare-refgen:api end -->
 
 ## License
 
