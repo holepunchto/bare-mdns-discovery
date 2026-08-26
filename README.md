@@ -77,9 +77,7 @@ class MyServiceDiscovery extends Discovery {
 
 ## API
 
-See the [`bare-mdns-discovery` reference][reference].
-
-[reference]: https://docs.pears.com/reference/bare/modules/bare-mdns-discovery
+See the [`bare-mdns-discovery` reference](https://docs.pears.com/reference/bare/modules/bare-mdns-discovery).
 
 ## License
 
